@@ -28,7 +28,7 @@ void *function_cars (threads_param *p) {
 
 	printf("Finish %s %d\n", p->string, p->id);
 
-	pthread_exit(NULL);//parameter is placeholder, will change when wait function is added
+	pthread_exit((void*)p.id);//I need this. Can't get it. How?
 
 	//C O D E 2
 
@@ -37,7 +37,8 @@ void *function_cars (threads_param *p) {
 
 int main(void){
 	
-	int i, *res;
+	int i, *res, rc;//rc acts as flag to see if p_thread worked or not
+	void *status; //after joining
 
 	printf("Start of thread creation process...\n");
 
@@ -46,11 +47,11 @@ int main(void){
 	for (i=0; i<n_cars; i++) {
 
 		parameters[i].id = i;
-		sprintf(parameters[i].*string, "%d",parameters[i].id);
-		//writing the id in string because I don't know what to do with it
+		parameters[i].string = "potato"; 
+		//writing this arbitrary thing in string because I don't know what to do with it
 		
-		id = pthread_create(&thread_table[i],NULL, function_cars, (void *)&parameters[i]);
-		if (id){ //will be true if id is anything but an actual integer (error return value)	
+		rc = pthread_create(&thread_table[i],NULL, function_cars, (void *)&parameters[i]);
+		if (rc){ //will be true if id is anything but an actual integer (error return value)	
 			printf("Error creating thread\n");
 			exit(-1);
 		}
@@ -65,6 +66,13 @@ int main(void){
 
 
 	for (i=0; i<n_cars; i++) {
+
+		rc = pthread_join(thread_table[i],&status);
+		if (rc) {
+			printf("Error joining threads");
+			exit(-1);
+		}
+		printf("Completed join with car %d",(int)status);
 	
 	
 		//C O D E 3
