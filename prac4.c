@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h> //was missing, we need it to call sleep!
 #define n_cars 8
 
 //Array for thread identification
@@ -17,7 +18,9 @@ typedef struct {
 threads_param parameters[n_cars];
 
 //Function executed by threads
-void *function_cars (threads_param *p) {
+void *function_cars (void *aux) {
+	threads_param *p = (threads_param*)aux;
+	//Since the function can only be called with void, we cast it back to the parameters
 
 	int random;
 	printf("Start %s %d\n", p->string, p->id);
@@ -28,17 +31,14 @@ void *function_cars (threads_param *p) {
 
 	printf("Finish %s %d\n", p->string, p->id);
 
-	pthread_exit((void*)p.id);//I need this. Can't get it. How?
-
-	//C O D E 2
-
-
+	pthread_exit((void*)p->id);
 }
 
 int main(void){
 	
-	int i, *res, rc;//rc acts as flag to see if p_thread worked or not
-	void *status; //after joining
+	int i, rc;//rc acts as flag to see if p_thread worked or not
+	//int  *res; //unsure of what this is for, commenting it out as I don't use it
+	void *status; //after joining, it gives the thread's status
 
 	printf("Start of thread creation process...\n");
 
@@ -55,9 +55,6 @@ int main(void){
 			printf("Error creating thread\n");
 			exit(-1);
 		}
-
-		//C O D E 1
-
 	}
 
 	printf("End of thread process creation\n");
@@ -72,11 +69,7 @@ int main(void){
 			printf("Error joining threads");
 			exit(-1);
 		}
-		printf("Completed join with car %d",(int)status);
-	
-	
-		//C O D E 3
-
+		printf("Car %d has reached the finish line",(int)status);
 	}
 
 	printf("All cars have REACHED THE FINISH LINE \n");
