@@ -66,10 +66,10 @@ int main(void){
 
 		rc = pthread_join(thread_table[i],&status);
 		if (rc) {
-			printf("Error joining threads");
+			printf("Error joining threads\n");
 			exit(-1);
 		}
-		printf("Car %d has reached the finish line",(int)status);
+		printf("Car %d has reached the finish line\n",(int)status);
 	}
 
 	printf("All cars have REACHED THE FINISH LINE \n");
