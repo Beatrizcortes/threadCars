@@ -7,6 +7,8 @@
 
 //Array for thread identification
 pthread_t thread_table[n_cars];
+//Global mutex definition
+pthread_mutex_t mutexsum;
 
 //Data type thread_param
 typedef struct {
@@ -30,6 +32,7 @@ void *function_cars (void *aux) {
 	sleep(1+(random%4));
 
 	printf("Finish %s %d\n", p->string, p->id);
+	pthread_mutex_lock(&mutexsum);
 
 	pthread_exit((void*)p->id);
 }
@@ -47,9 +50,8 @@ int main(void){
 	for (i=0; i<n_cars; i++) {
 
 		parameters[i].id = i;
-		parameters[i].string = "potato"; 
-		//writing this arbitrary thing in string because I don't know what to do with it
-		
+		parameters[i].string = "car"; 
+		pthread_mutex_init(&mutexsum, NULL);	
 		rc = pthread_create(&thread_table[i],NULL, function_cars, (void *)&parameters[i]);
 		if (rc){ //will be true if id is anything but an actual integer (error return value)	
 			printf("Error creating thread\n");
@@ -63,15 +65,16 @@ int main(void){
 
 
 	for (i=0; i<n_cars; i++) {
-
 		rc = pthread_join(thread_table[i],&status);
 		if (rc) {
 			printf("Error joining threads\n");
 			exit(-1);
 		}
+		pthread_mutex_unlock(&mutexsum);
 		printf("Car %d has reached the finish line\n",(int)status);
 	}
 
 	printf("All cars have REACHED THE FINISH LINE \n");
+	pthread_mutex_destroy(&mutexsum);//we should destroy it before terminating
 	return 0;
 }
