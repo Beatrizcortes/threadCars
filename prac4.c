@@ -10,7 +10,7 @@ pthread_t thread_table[n_cars];
 //Global mutex definition
 pthread_mutex_t mutexsum;
 //Global variable to store sum of randoms
-int sum;
+int sum=0;
 //Data type thread_param
 typedef struct {
 	int id;
@@ -30,9 +30,8 @@ void *function_cars (void *aux) {
 
 	fflush(stdout);
 	random = rand();
-
 	pthread_mutex_lock (&mutexsum); //lock mutex before global value change
-	sum+=random;
+	sum+=(1+(random%4));
 	pthread_mutex_unlock(&mutexsum);
 	sleep(1+(random%4));
 
